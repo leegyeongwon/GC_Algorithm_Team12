@@ -1,0 +1,87 @@
+/* 알고리즘
+1. 파일 입출력
+2. 문자의 빈도(개수)를 세서 freq에 저장
+3. 이를 기반으로 2진트리 만들기
+4. 이에 따라 이진수를 각 문자를 할당
+5. 각 문자에 대응하는 바이너리 숫자를 문자대신 입력하고 파일 저장
+*/
+
+// ***아직 미완***
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+void make_new_node(struct Node* , char);
+typedef struct Node {
+	char C;             //문자
+	int freq;           //빈도(몇번 나오는가)
+	struct Node* left;         //트리 요소 왼쪽
+	struct Node* right;        //트리 요소 오른쪽
+	struct Node* next;
+}Node;
+
+void make_new_node(Node* head, char c)                //새 노드를 만드는 함수
+{
+	Node* temp;
+	temp = head;
+	if (head->C == NULL)                              //헤드의 값이 안들어 있으면 헤드만들기
+	{
+		head->C = c;
+		head->freq++;
+		head->next = NULL;
+	}
+	else                                                 //헤드 값이 있다면 새로운 노드를 만듦
+	{
+		Node* new_node = (Node*)malloc(sizeof(Node));
+		new_node->freq = 0;
+
+		while (temp->next != NULL)
+			temp = temp->next;
+
+		temp->next = new_node;
+		new_node->C = c;
+		new_node->freq++;
+		new_node->next = NULL;
+	}
+}
+
+void main()
+{
+	char c;
+	Node* head = (Node*)malloc(sizeof(Node));            //head노드(첫 노드) 만들기, 초기화
+	head->C = NULL;
+	head->freq = -1;                                     //노드를 만들 때 freq가 +1 되므로 -1로 초기화. 결과적으로 (문자 == NULL), freq == 0으로 초기화됨
+	Node* temp = head;                                   //즉,  head는 처음에는 아무것도 없는 노드로 만들어지고, 
+	make_new_node(head, ' ');                            //첫번째 문자가 저장될 때 문자가 저장되고, freq == 1이 된다.
+	
+	FILE* file;
+	file = fopen("C://Java_assignment//test.txt", "r");  //파일 읽기모드로 열기.(경로 지정 필수)
+
+	while (fscanf(file, "%c", &c) != EOF)                //**파일에서 읽은 다음 노드가 이미 존재하면 freq를 1올리고 아니면 새로운 노드를 만듦
+	{
+		int already_exist = 0;
+		while (temp != NULL)                             //링크드 리스트 안에 문자가 이미 있는지 확인
+		{
+			if (temp->C == c)
+			{
+				temp->freq++;
+				already_exist = 1;
+				break;
+			}
+			temp = temp->next;
+		}
+		if (already_exist == 0)                          //링크드 리스트 안에 문자가 없으면(already_exist == 0이면) 새 노드를 만들고 초기화 한 다음 값들을 할당
+			make_new_node(head, c);
+		temp = head;
+	}
+
+	while(head != NULL)                                //출력 테스트 코드
+	{
+		printf("(%c %d) -> ", head->C, head->freq);
+		head = head->next;
+	}
+	printf("NULL");
+
+	fclose(file);
+}
