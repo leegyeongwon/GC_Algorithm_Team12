@@ -37,10 +37,10 @@ public class Testing {
 		
 		while(inputStream.hasNextLine()) {
 			String line = inputStream.nextLine();
-            for (int i = 0; i < line.length(); i++) {
-                char singleChar = line.charAt(i);
-                frequencyMap.put(singleChar, frequencyMap.getOrDefault(singleChar, 0) + 1);       //덮어쓰게 됨(해시맵은 key 중복 불가한 타입)
-            }
+            		for (int i = 0; i < line.length(); i++) {
+                		char singleChar = line.charAt(i);
+                		frequencyMap.put(singleChar, frequencyMap.getOrDefault(singleChar, 0) + 1);       //덮어쓰게 됨(해시맵은 key 중복 불가한 타입)
+            		}
 		}
 		
 		for(Entry<Character, Integer> entry : frequencyMap.entrySet()) {
