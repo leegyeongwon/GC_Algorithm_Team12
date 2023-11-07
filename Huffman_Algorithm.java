@@ -14,9 +14,8 @@ class HuffmanNode implements Comparable<HuffmanNode> {      //구조체(클래�
 	public int compareTo(HuffmanNode node) {                //compareTo : priority queue를 정렬할 때 이 함수를 기준으로 자동 정렬함
 		return this.frequency - node.frequency;
 	}
-		
-	
 }
+
 
 public class Testing {
 	
@@ -48,10 +47,10 @@ public class Testing {
 			System.out.println("Key : " + entry.getKey() + " | Value : " + entry.getValue());     //하나하나 출력해보는 테스트 코드
 		}
 		
-		PriorityQueue<HuffmanNode> priority_queue = new PriorityQueue<>();  //PriorityQueue 데이터 타입은 자동으로 정렬해 줌
-		for(char key : frequencyMap.keySet()) {								//정렬 기준은 compareTo함수(구조체에 선언 되어있음)
-			HuffmanNode node = new HuffmanNode();							//자료 구조는 레드-블랙 트리. 즉, root위치에 있는 것만 뽑아낼 수 있음
-			node.data = key;												//우리는 작은값 -> 큰값 순으로 출력됨
+		PriorityQueue<HuffmanNode> priority_queue = new PriorityQueue<>();     //PriorityQueue 데이터 타입은 자동으로 정렬해 줌
+		for(char key : frequencyMap.keySet()) {				       //정렬 기준은 compareTo함수(구조체에 선언 되어있음)
+			HuffmanNode node = new HuffmanNode();			       //자료 구조는 레드-블랙 트리. 즉, root위치에 있는 것만 뽑아낼 수 있음
+			node.data = key;              				       //우리는 작은값 -> 큰값 순으로 출력됨
 			node.frequency = frequencyMap.get(key);
 			node.left = null;
 			node.right = null;
