@@ -50,7 +50,7 @@ public class Testing {
 		
 		PriorityQueue<HuffmanNode> priority_queue = new PriorityQueue<>();  //PriorityQueue 데이터 타입은 자동으로 정렬해 줌
 		for(char key : frequencyMap.keySet()) {								//정렬 기준은 compareTo함수(구조체에 선언 되어있음)
-			HuffmanNode node = new HuffmanNode();							//자료 구조는 레드-블랙 트리. 즉, root위치에 있는 것만 뽑아낼 수 있음
+			HuffmanNode node = new HuffmanNode();							//자료 구조는 힙(heap). 즉, root위치에 있는 것만 뽑아낼 수 있음
 			node.data = key;												//우리는 작은값 -> 큰값 순으로 출력됨
 			node.frequency = frequencyMap.get(key);
 			node.left = null;
