@@ -1,4 +1,5 @@
 package Testing_package;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -14,9 +15,8 @@ class HuffmanNode implements Comparable<HuffmanNode> {      //구조체(클래�
 	public int compareTo(HuffmanNode node) {                //compareTo : priority queue를 정렬할 때 이 함수를 기준으로 자동 정렬함
 		return this.frequency - node.frequency;
 	}
-		
-	
 }
+
 
 public class Testing {
 	
@@ -27,6 +27,7 @@ public class Testing {
 		System.out.println("Enter the name of file(include Path) : ");
 		String file = keyboard.nextLine();
 		Scanner inputStream = null;
+		String file_content = "";
 		
 		try {
 			inputStream = new Scanner(new File(file));                     //파일 열기
@@ -38,10 +39,11 @@ public class Testing {
 		
 		while(inputStream.hasNextLine()) {
 			String line = inputStream.nextLine();
-            		for (int i = 0; i < line.length(); i++) {
-                		char singleChar = line.charAt(i);
-                		frequencyMap.put(singleChar, frequencyMap.getOrDefault(singleChar, 0) + 1);       //덮어쓰게 됨(해시맵은 key 중복 불가한 타입)
-           		}
+            for (int i = 0; i < line.length(); i++) {
+                char singleChar = line.charAt(i);
+                file_content = file_content + singleChar;
+                frequencyMap.put(singleChar, frequencyMap.getOrDefault(singleChar, 0) + 1);       //덮어쓰게 됨(해시맵은 key 중복 불가한 타입)
+            }
 		}
 		
 		for(Entry<Character, Integer> entry : frequencyMap.entrySet()) {
@@ -50,7 +52,7 @@ public class Testing {
 		
 		PriorityQueue<HuffmanNode> priority_queue = new PriorityQueue<>();  //PriorityQueue 데이터 타입은 자동으로 정렬해 줌
 		for(char key : frequencyMap.keySet()) {								//정렬 기준은 compareTo함수(구조체에 선언 되어있음)
-			HuffmanNode node = new HuffmanNode();							//자료 구조는 힙(heap). 즉, root위치에 있는 것만 뽑아낼 수 있음
+			HuffmanNode node = new HuffmanNode();							//자료 구조는 레드-블랙 트리. 즉, root위치에 있는 것만 뽑아낼 수 있음
 			node.data = key;												//우리는 작은값 -> 큰값 순으로 출력됨
 			node.frequency = frequencyMap.get(key);
 			node.left = null;
@@ -65,6 +67,22 @@ public class Testing {
 		
 		//바이너리 트리 만들기
 		HuffmanNode root = BuildBinaryTree(priority_queue);
+		
+		//트리를 만들고 바이너리 값을 각각 할당 해야함
+		HashMap<Character, String> BinaryCode = new HashMap<>();
+		GenerateBinaryCode(root, "", BinaryCode);
+		
+		for(Entry<Character, String> entry : BinaryCode.entrySet()) {
+			System.out.println(entry.getKey() + " : " + entry.getValue());
+		}
+		
+		//압축단계
+		String compressed_string = Compress(BinaryCode, file_content);
+		System.out.println(compressed_string);
+		
+		//암호화
+
+		//헤더를 추가해서 압축한 내용과 같이 텍스트 파일을 저장
 		
 		
 		keyboard.close();
@@ -83,23 +101,38 @@ public class Testing {
 			parent.frequency = left.frequency + right.frequency;   //이 문자(007)는 텍스트 파일에 있으면 안됨 있으면 오류남
 			parent.left = left;
 			parent.right = right;
-			queue.add(parent);           //parents를 다시 queue로 넣음. queue안의 요소가 1이 될 떄 까지 반복시킬 때 까지 반복됨
+			queue.add(parent);           //parent를 다시 queue로 넣음. queue안의 요소가 1이 될 떄 까지 반복시킬 때 까지 반복됨
 		}
 		return queue.poll();          //root를 반환하고(HuffmanNode 형태로) 함수 종료.
 	}
 	
-	//압축하기
-	public static HuffmanNode Compress() {
-		return null;	
+	public static void GenerateBinaryCode(HuffmanNode node, String data, HashMap<Character, String> BinaryCode) {
+		//inorder, preorder, postorder중 하나를 선택해서 0,1을 할당하는 형식으로 작성 recursion을 사용. inorder로 하려고 생각하고 있음
+		if(node == null) return;         //노드가 존재하지 않으면 그냥 리턴
+		if(node.data != 007) {           //끝노드 즉, 어떤 한 문자에 도달하면 새로운 해시맵에 데이터를 넣음
+			BinaryCode.put(node.data, data);
+		}
+		GenerateBinaryCode(node.left, data + "0", BinaryCode);        //inorder로 하기 위해 recursion
+		GenerateBinaryCode(node.right, data + "1", BinaryCode);       //왼쪽 한 다음 오른쪽
 	}
 	
-	//압축 풀기
-	public static HuffmanNode UnCompress() {
-		return null;
+	//압축하기
+	public static String Compress(HashMap<Character, String> binaryCode, String file_content) {
+		String compressed_string = "";
+		for (int i = 0; i < file_content.length(); i++) {
+            char singleChar = file_content.charAt(i);
+            compressed_string = compressed_string + binaryCode.get(singleChar);
+        }
+		return compressed_string;
 	}
 	
 	//암호화 하기
 	public static HuffmanNode Encode() {
+		return null;
+	}
+	
+	//압축 풀기
+	public static HuffmanNode UnCompress() {
 		return null;
 	}
 	
