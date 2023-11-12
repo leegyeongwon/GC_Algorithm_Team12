@@ -132,6 +132,26 @@ public class Testing {
 	public static HuffmanNode Encode() {
 		return null;
 	}
+
+	// key 생성을 위한 소수판별 메소드
+	public static int isPrime(int n) {
+		for (int i = 2; i <= (int) Math.sqrt(n); i++) {
+			if (n % i == 0) {
+				return 0;
+			}
+		}
+		return 1;
+	}
+
+	// 1과 1000사이의 소수들 중 하나를 random으로 얻는 메소드
+	public static int primeGenerator() {
+		while(true) {
+			int randP = (int) (Math.random() * 1000) + 1;
+			if(isPrime(randP) == 1) {
+				return randP;
+			}
+		}
+	}
 	
 	//압축 풀기
 	public static HuffmanNode UnCompress() {
