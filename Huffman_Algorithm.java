@@ -81,7 +81,9 @@ public class Testing {
 		System.out.println(compressed_string);
 		
 		//암호화
-
+		int plain_num = Integer.parseInt(compressed_string, 2);       // 2진수 형태의 compressed_string 을 암호화하기 위해 10진수로 변환
+		System.out.println("The plain number" + " : " + plain_num);   // 프로그래밍 단계에서는 일단 출력, 추후 출력하는 코드는 삭제 예정
+		
 		//헤더를 추가해서 압축한 내용과 같이 텍스트 파일을 저장
 		
 		
