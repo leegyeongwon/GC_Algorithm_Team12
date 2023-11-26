@@ -1,7 +1,10 @@
 package Testing_package;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.PriorityQueue;
@@ -50,15 +53,8 @@ public class Testing {
 			System.out.println("Key : " + entry.getKey() + " | Value : " + entry.getValue());     //하나하나 출력해보는 테스트 코드
 		}
 		
-		PriorityQueue<HuffmanNode> priority_queue = new PriorityQueue<>();  //PriorityQueue 데이터 타입은 자동으로 정렬해 줌
-		for(char key : frequencyMap.keySet()) {								//정렬 기준은 compareTo함수(구조체에 선언 되어있음)
-			HuffmanNode node = new HuffmanNode();							//자료 구조는 레드-블랙 트리. 즉, root위치에 있는 것만 뽑아낼 수 있음
-			node.data = key;												//우리는 작은값 -> 큰값 순으로 출력됨
-			node.frequency = frequencyMap.get(key);
-			node.left = null;
-			node.right = null;
-			priority_queue.add(node);
-		}
+		PriorityQueue<HuffmanNode> priority_queue = new PriorityQueue<>();
+		priority_queue = Make_Priority_Queue(frequencyMap);
 		
 		//frequency만 출력하는 테스트 코드
 		while(priority_queue.isEmpty()) {
@@ -72,13 +68,25 @@ public class Testing {
 		HashMap<Character, String> BinaryCode = new HashMap<>();
 		GenerateBinaryCode(root, "", BinaryCode);
 		
+		//max_len_of_binarycode 헤더를 만들 때 [허프만코드길이][아스키코드화문자][허프만코드] 중 [허프만코드길이]에 해당하는 부분임.
 		for(Entry<Character, String> entry : BinaryCode.entrySet()) {
 			System.out.println(entry.getKey() + " : " + entry.getValue());
 		}
 		
+		
+		//헤더에 해당되는 해시맵 만들기
+		HashMap<String, String> HashMapHeader = new HashMap<>();
+		for(Entry<Character, String> entry : BinaryCode.entrySet()) {
+			HashMapHeader.put(Integer.toBinaryString((int)entry.getKey()), entry.getValue());
+		}
+		
+		for(Entry<String, String> entry : HashMapHeader.entrySet()) {
+			System.out.println("Key :" + entry.getKey() + " value :" + entry.getValue() + " value's len in binary : " + Integer.toBinaryString(entry.getValue().length()));
+		}
+		
 		//압축단계
 		String compressed_string = Compress(BinaryCode, file_content);
-		System.out.println(compressed_string);
+		System.out.println("Compressed_string : " + compressed_string);
 		
 		// 2진수 형태의 compressed_string 을 암호화하기 위해 10진수로 변환
 		// BigInteger 형태는 무한대 범위까지의 정수를 저장하는 것이 가능 
@@ -97,6 +105,14 @@ public class Testing {
 
 		System.out.println("Public Key : (" + p_key + ", " + n + ")");
 		System.out.println("Secret Key : (" + s_key + ", " + n + ")");
+		
+		
+		
+		String pwBinary = s_key.toString(2);
+		System.out.println("Secret key(Binary) : " + pwBinary);
+		
+		
+		
 
 		// plain_num을 4자리씩 분할하여 각각에 대해 암호화 진행
 		String[] plain_divide = splitNumber(plain_num.toString(), 4);  // plain_num을 4자리씩 분할
@@ -116,7 +132,7 @@ public class Testing {
 		for (String part : cipher_con) {
 			System.out.print(part);
 		}
-
+		
 		// 사용자가 secret key를 알고있는지 확인하는 절차
 		// 5회 이내에 알맞은 secret key를 입력하지 못하면 프로그램 종료
 		BigInteger password = new BigInteger("0");
@@ -171,13 +187,96 @@ public class Testing {
 		System.out.println("Original binary : " + origin_binary);
 		
 		//헤더를 추가해서 압축한 내용과 같이 텍스트 파일을 저장
-
+		
+		save_the_data(HashMapHeader, compressed_string, pwBinary);
+		
+		
 		
 		keyboard.close();
 		inputStream.close();
 	}
 		
+	
+	
 	//=============================여기서 부터 함수======================================
+	public static void save_the_data(HashMap<String, String> map, String compressed_data, String pw) {
+		Scanner keyboard2 = new Scanner(System.in);
+		System.out.println("Enter the file path (저장할 파일): ");
+		String file = keyboard2.nextLine();
+		String MapHeaderString = pw;
+		
+		file = file + ".bin";
+		
+		try (BufferedOutputStream bin_file = new BufferedOutputStream(new FileOutputStream(file))) {
+			for(Entry<String, String> entry : map.entrySet()) {
+				MapHeaderString = MapHeaderString + padBinaryString(Integer.toBinaryString(entry.getValue().length()), 4) + entry.getKey() + entry.getValue();
+				System.out.println("pad toBinaryString : " + padBinaryString(Integer.toBinaryString(entry.getValue().length()), 4));
+			}
+			
+			for(int i = 0; i < 4; i++) {
+				MapHeaderString = MapHeaderString + "0";
+			}
+			MapHeaderString = MapHeaderString + "0000" + compressed_data;
+			
+			byte[] MapHeader = binaryStringToByteArray(MapHeaderString);
+			for (byte b : MapHeader) {
+	            System.out.print(Integer.toBinaryString(b & 255 | 256).substring(1));
+	        }
+			
+			bin_file.write(MapHeader);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+		keyboard2.close();
+	}
+	
+	//String 타입을 byte[]타입으로 바꾸는 함수. byte[]타입은 0과 1이 8비트씩 쪼개 들어감.
+	private static byte[] binaryStringToByteArray(String binaryString) {
+        int length = binaryString.length();
+        int numOfBytes = (int) Math.ceil((double) length / 8);
+        byte[] byteArray = new byte[numOfBytes];
+
+        for (int i = 0; i < numOfBytes; i++) {
+            int endIndex = Math.min((i + 1) * 8, length);
+            String byteString = binaryString.substring(i * 8, endIndex);
+            byteArray[i] = (byte) Integer.parseInt(byteString, 2);
+        }
+
+        return byteArray;
+    }
+	
+	// 이진 문자열을 일정한 길이로 만들어주는 메서드
+    private static String padBinaryString(String binaryString, int fixedLength) {
+        String result = "";
+
+        // 입력된 이진 문자열이 길이보다 짧을 경우 앞에 0을 채움
+        int paddingLength = fixedLength - binaryString.length();
+        for (int i = 0; i < paddingLength; i++) {
+            result = result + "0";
+        }
+
+        // 입력된 이진 문자열의 나머지 부분을 추가
+        result = result + binaryString;
+
+        // 만들어진 결과를 문자열로 반환
+        return result.toString();
+    }
+	
+	//priority queue 만들기
+	public static PriorityQueue<HuffmanNode> Make_Priority_Queue(HashMap<Character, Integer> frequencyMap) {
+		PriorityQueue<HuffmanNode> priority_queue = new PriorityQueue<>();  //PriorityQueue 데이터 타입은 자동으로 정렬해 줌
+		for(char key : frequencyMap.keySet()) {								//정렬 기준은 compareTo함수(구조체에 선언 되어있음)
+			HuffmanNode node = new HuffmanNode();							//자료 구조는 힙. root위치에 있는 것만 뽑아낼 수 있음
+			node.data = key;												//우리는 작은값 -> 큰값 순으로 출력됨
+			node.frequency = frequencyMap.get(key);
+			node.left = null;
+			node.right = null;
+			priority_queue.add(node);
+		}
+		return priority_queue;
+	}
+	
 	//바이너리 트리 만들기
 	public static HuffmanNode BuildBinaryTree(PriorityQueue<HuffmanNode> queue) {
 		while(queue.size() != 1) {                             //queue가 1이 아닐 때 까지 반복(queue가 1이면 root 1개만 남은 것임)
