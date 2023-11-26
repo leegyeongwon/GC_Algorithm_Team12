@@ -179,7 +179,7 @@ public class Testing {
 		}
 
 		BigInteger decrypt_int = new BigInteger(decrypt_con);  // 합쳐진 문자열을 BigInteger 형태로 변환 
-
+		
 		// 복호화된 상태의 10진수를 2진수 형태로 변환 (압축이 완료된 직후의 형태)
 		String origin_binary = decrypt_int.toString(2);  
 
@@ -190,10 +190,32 @@ public class Testing {
 		
 		save_the_data(HashMapHeader, compressed_string, pwBinary);
 		
+		inputStream.close();
 		
+		
+		
+		System.out.println("\n\nFrom now, de-compressing!\n");
+		System.out.println("Enter the path of file to de-compress : ");
+		String decom_file = keyboard.nextLine();
+	
+		Scanner inputStream_decom = null;
+		
+		try {
+			inputStream_decom = new Scanner(new File(decom_file));                     //파일 열기
+		}
+		catch(FileNotFoundException e){
+			System.out.println("Error : FileNotFoundException. umm" + decom_file);      //파일 예외처리
+			System.exit(0);
+		}
+		
+		while(inputStream_decom.hasNextLine()) {
+			String line = inputStream_decom.nextLine();
+            for (int i = 0; i < line.length(); i++) {
+            	System.out.println("content\n" + line);
+            }
+		}
 		
 		keyboard.close();
-		inputStream.close();
 	}
 		
 	
@@ -201,8 +223,8 @@ public class Testing {
 	//=============================여기서 부터 함수======================================
 	public static void save_the_data(HashMap<String, String> map, String compressed_data, String pw) {
 		Scanner keyboard2 = new Scanner(System.in);
-		System.out.println("Enter the file path (저장할 파일): ");
-		String file = keyboard2.nextLine();
+		System.out.println("Enter the file path (For save): ");
+		String file = keyboard2.next();
 		String MapHeaderString = pw;
 		
 		file = file + ".bin";
@@ -228,6 +250,7 @@ public class Testing {
         } catch (IOException e) {
             e.printStackTrace();
         }
+		
 		keyboard2.close();
 	}
 	
