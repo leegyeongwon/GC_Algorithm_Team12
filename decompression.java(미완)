@@ -1,0 +1,81 @@
+package Testing_package;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Scanner;
+
+public class Testing_for_decompressing {
+
+	public static void main(String[] args) {
+		HashMap<Character, String> hash_map_for_decom = new HashMap<>();		//prefix를 저장할 해시맵
+		
+		System.out.print("Enter the path of file to de-compress : ");
+		Scanner keyboard = new Scanner(System.in);
+		String decom_file = keyboard.nextLine();
+		
+		try (FileInputStream inputStream_decom = new FileInputStream(decom_file)) {
+			int data;
+			String binaryString = "";
+			
+			System.out.print("Enter the password : ");
+			int Temp_PW = keyboard.nextInt();
+			String Entered_PW = Integer.toBinaryString(Temp_PW);
+			int Entered_PW_length = Entered_PW.length();
+			
+            // 파일에서 한 바이트씩 읽어서 이진 문자열로 변환
+            while ((data = inputStream_decom.read()) != -1) {
+                binaryString += String.format("%8s", Integer.toBinaryString(data & 0xFF)).replace(' ', '0');
+            }
+            
+            String PW_check = "";
+            for(int i = 0; i < Entered_PW_length; i++){
+            	System.out.print(binaryString.charAt(i));
+            	PW_check += binaryString.charAt(i);
+            }
+            
+            if(PW_check.equals(Entered_PW)) {
+            	System.out.println("\nCorrect!");
+            	
+            	//첫 4비트는 [허프만 코드의 길이]를 나타냄. 그다음 8비트는 문자, 그다음은 허프만 코드.
+            	int len_of_huffmancode = -1;
+            	char Character;
+            	String HuffmanCode;
+            	
+            	while(len_of_huffmancode != 0) {
+            		len_of_huffmancode = Integer.parseInt(binaryString.substring(Entered_PW_length, Entered_PW_length +4), 2);
+                	//System.out.println(binaryString.substring(Entered_PW_length,Entered_PW_length +4));
+                	//System.out.println("len_of_huffmancode : " + len_of_huffmancode);
+                	Entered_PW_length += 4;
+                	
+                	Character = (char)Integer.parseInt(binaryString.substring(Entered_PW_length, Entered_PW_length +8), 2);
+                	//System.out.println(binaryString.substring(Entered_PW_length, Entered_PW_length + 8));
+                	//System.out.println("Character : " + Character);
+                	Entered_PW_length += 8;
+                	
+                	HuffmanCode = binaryString.substring(Entered_PW_length, Entered_PW_length + len_of_huffmancode);
+                	//System.out.println("Huffmancode : " + HuffmanCode);
+                	Entered_PW_length += len_of_huffmancode;
+                	
+                	hash_map_for_decom.put(Character, HuffmanCode);
+            	}
+            	System.out.println("Its over. Result : ");
+            	for(Entry<Character, String> entry : hash_map_for_decom.entrySet()) {
+            		System.out.println("Key : " + entry.getKey() + " | Value : " + entry.getValue());
+            	}
+            	
+            }
+            else {
+            	System.out.println("Password is wrong.");
+            }
+            
+		}
+		catch (IOException e) {
+            e.printStackTrace();
+        }
+		
+		keyboard.close();
+	}
+
+}
