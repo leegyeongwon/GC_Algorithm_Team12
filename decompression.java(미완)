@@ -2,6 +2,7 @@ package Testing_package;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -9,7 +10,7 @@ import java.util.Scanner;
 public class Testing_for_decompressing {
 
 	public static void main(String[] args) {
-		HashMap<Character, String> hash_map_for_decom = new HashMap<>();		//prefix를 저장할 해시맵
+		HashMap<String, Character> hash_map_for_decom = new HashMap<>();		//prefix를 저장할 해시맵
 		
 		System.out.print("Enter the path of file to de-compress : ");
 		Scanner keyboard = new Scanner(System.in);
@@ -21,8 +22,9 @@ public class Testing_for_decompressing {
 			
 			System.out.print("Enter the password : ");
 			int Temp_PW = keyboard.nextInt();
+			keyboard.nextLine();
 			String Entered_PW = Integer.toBinaryString(Temp_PW);
-			int Entered_PW_length = Entered_PW.length();
+			int current_index = Entered_PW.length();		//입력된 비번 길이로 current_index를 초기화
 			
             // 파일에서 한 바이트씩 읽어서 이진 문자열로 변환
             while ((data = inputStream_decom.read()) != -1) {
@@ -30,7 +32,7 @@ public class Testing_for_decompressing {
             }
             
             String PW_check = "";
-            for(int i = 0; i < Entered_PW_length; i++){
+            for(int i = 0; i < current_index; i++){
             	System.out.print(binaryString.charAt(i));
             	PW_check += binaryString.charAt(i);
             }
@@ -44,32 +46,48 @@ public class Testing_for_decompressing {
             	String HuffmanCode;
             	
             	while(len_of_huffmancode != 0) {
-            		len_of_huffmancode = Integer.parseInt(binaryString.substring(Entered_PW_length, Entered_PW_length +4), 2);
+            		len_of_huffmancode = Integer.parseInt(binaryString.substring(current_index, current_index +4), 2);
                 	//System.out.println(binaryString.substring(Entered_PW_length,Entered_PW_length +4));
                 	//System.out.println("len_of_huffmancode : " + len_of_huffmancode);
-                	Entered_PW_length += 4;
+            		current_index += 4;
                 	
-                	Character = (char)Integer.parseInt(binaryString.substring(Entered_PW_length, Entered_PW_length +8), 2);
+                	Character = (char)Integer.parseInt(binaryString.substring(current_index, current_index +8), 2);
                 	//System.out.println(binaryString.substring(Entered_PW_length, Entered_PW_length + 8));
                 	//System.out.println("Character : " + Character);
-                	Entered_PW_length += 8;
+                	current_index += 8;
                 	
-                	HuffmanCode = binaryString.substring(Entered_PW_length, Entered_PW_length + len_of_huffmancode);
+                	HuffmanCode = binaryString.substring(current_index, current_index + len_of_huffmancode);
                 	//System.out.println("Huffmancode : " + HuffmanCode);
-                	Entered_PW_length += len_of_huffmancode;
+                	current_index += len_of_huffmancode;
                 	
-                	hash_map_for_decom.put(Character, HuffmanCode);
+                	hash_map_for_decom.put(HuffmanCode, Character);
             	}
-            	System.out.println("Its over. Result : ");
-            	for(Entry<Character, String> entry : hash_map_for_decom.entrySet()) {
-            		System.out.println("Key : " + entry.getKey() + " | Value : " + entry.getValue());
+            	//위 과정에서 4비트 만큼 밀려서 다시 당겨줌
+            	current_index -= 4;
+            	
+            	//허프만 코드 출력
+            	//System.out.println("\nResult");
+            	//for(Entry<String, Character> entry : hash_map_for_decom.entrySet()) {
+            	//	System.out.println("Key : " + entry.getKey() + " | Value : " + entry.getValue());
+            	//}
+            	
+            	String ASCII_Character = "";
+            	String content = "";
+            	for(int i = current_index; i < binaryString.length(); i++) {
+            		ASCII_Character += binaryString.charAt(i);
+            		if(hash_map_for_decom.containsKey(ASCII_Character)) {
+            			//System.out.print(hash_map_for_decom.get(ASCII_Character));
+            			content += hash_map_for_decom.get(ASCII_Character);
+            			ASCII_Character = "";
+            		}
             	}
             	
+            	save_text_file(keyboard, content);
             }
             else {
             	System.out.println("Password is wrong.");
-            }
-            
+            	System.exit(0);
+            }           
 		}
 		catch (IOException e) {
             e.printStackTrace();
@@ -78,4 +96,18 @@ public class Testing_for_decompressing {
 		keyboard.close();
 	}
 
+	
+	private static void save_text_file(Scanner keyboard, String content) {
+		System.out.print("\nEnter the location where the file will be saved : ");
+		String text_file_path = keyboard.nextLine();
+		
+		try(PrintWriter outputStream = new PrintWriter(text_file_path)) {
+			outputStream.print(content);
+			System.out.print("\nContent is saved in " + text_file_path);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
 }
