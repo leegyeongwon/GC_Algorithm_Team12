@@ -375,23 +375,6 @@ public class Testing {
 		keyArr[2] = n;
 	}
 
-	// key 생성을 위한 소수판별 메소드
-	public static boolean isPrime(BigInteger n) {
-		// 0과 1은 소수가 아님
-		if (n.compareTo(BigInteger.ONE) <= 0) {
-			return false;
-		}
-
-		// 2부터 n의 제곱근까지 나누어 떨어지는지 확인
-		for (BigInteger i = BigInteger.valueOf(2); i.compareTo(n.sqrt()) <= 0; i = i.add(BigInteger.ONE)) {
-			if (n.mod(i).equals(BigInteger.ZERO)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 	// 두 수의 최대공약수를 반환해주는 메소드
 	public static BigInteger Euclid(BigInteger a, BigInteger b) {
 		if (b.equals(BigInteger.ZERO)) { // b가 0일 때
