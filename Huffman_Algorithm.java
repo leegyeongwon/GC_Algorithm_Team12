@@ -104,7 +104,7 @@ public class Testing {
 		BigInteger n = keylist[2];      
 
 		System.out.println("Public Key : (" + p_key + ", " + n + ")");
-		System.out.println("Secret Key : (" + s_key + ", " + n + ")");
+		System.out.println("Secret Key : (" + "*****" + ", " + n + ")");
 		
 		
 		
@@ -160,10 +160,23 @@ public class Testing {
 		BigInteger cipherCon;
 		BigInteger Decrypt;
 
+		// Plain_num 과 복호화된 수의 총 자릿수를 일치시키기 위한 과정 포함
 		for (int i = 0; i < cipher_con.length; i++) {
 			cipherCon = new BigInteger(cipher_con[i]);
 			Decrypt = (BigInteger) Decode(cipherCon, s_key, n);
 			decrypt_div[i] = Decrypt.toString();
+			if (i == cipher_con.length - 1) {
+				if (decrypt_div[i].length() != plain_divide[i].length()) {
+					for(int k = 0; k < plain_divide[i].length() - decrypt_div[i].length(); k++) {
+						decrypt_div[i] = "0" + decrypt_div[i];
+					}
+				}
+			}
+			else if (decrypt_div[i].length() != 4) {
+				for (int j = 0; j <= 4 - decrypt_div[i].length(); j++) {
+					decrypt_div[i] = "0" + decrypt_div[i];
+				}
+			}
 		}
 		
 		// 복호화 완료된 결과를 출력
@@ -344,8 +357,8 @@ public class Testing {
 	// 암호화에 필요한 public key와 secret key를 무작위로 생성하는 메소드
 	public static void keyGenerator(BigInteger[] keyArr) {
 		// 두 개의 소수 p, q를 생성
-		BigInteger p = primeGenerator();
-		BigInteger q = primeGenerator();
+		BigInteger p = BigInteger.valueOf(233);
+		BigInteger q = BigInteger.valueOf(181);
 
 		BigInteger n = p.multiply(q); // n = p * q
 		BigInteger ET = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE)); // ET = (p-1) * (q-1), ET = "Euler Totient"
@@ -376,19 +389,6 @@ public class Testing {
 		}
 
 		return true;
-	}
-
-	// 100과 1000사이의 소수들 중 하나를 random으로 얻는 메소드
-	public static BigInteger primeGenerator() {
-		while (true) {
-			BigInteger randP = BigInteger.valueOf((long) (Math.random() * 1000) + 1); // randP는 최대 1000의 값을 가질 수 있음
-			if (randP.compareTo(BigInteger.valueOf(100)) < 0) { // randP의 값이 100보다 작다면 compareTo는 -1을 반환
-				continue;
-			}
-			if (isPrime(randP) == true) { // randP가 소수인지 판별
-				return randP;
-			}
-		}
 	}
 
 	// 두 수의 최대공약수를 반환해주는 메소드
