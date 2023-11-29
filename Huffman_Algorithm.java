@@ -103,6 +103,7 @@ public class Testing {
 		BigInteger s_key = keylist[1];  
 		BigInteger n = keylist[2];      
 
+		// secret key : 23863
 		System.out.println("Public Key : (" + p_key + ", " + n + ")");
 		System.out.println("Secret Key : (" + "*****" + ", " + n + ")");
 		
