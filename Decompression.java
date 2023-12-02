@@ -11,12 +11,11 @@ import java.util.Scanner;
 
 public class Testing_for_decompressing {
 
-	public static void main(String[] args) {
+	public static void main_decompression(String decom_file, String password_string, String save_file_path) {
 		HashMap<String, Character> hash_map_for_decom = new HashMap<>();		//prefix를 저장할 해시맵
 		
 		System.out.print("Enter the path of file to de-compress : ");
 		Scanner keyboard = new Scanner(System.in);
-		String decom_file = keyboard.nextLine();
 		
 		try (FileInputStream inputStream_decom = new FileInputStream(decom_file)) {
 			int data;
@@ -27,28 +26,16 @@ public class Testing_for_decompressing {
 			
 			BigInteger secret_key = new BigInteger("23863");
 			BigInteger n = new BigInteger("42173");
-			BigInteger password = new BigInteger("0");
+			BigInteger password = new BigInteger(password_string);
 			int count = 0;  // 남은 입력 기회
 
-			while (true) {
-				if (count == 0) {
-					System.out.print("\nEnter the proper secret key : ");
-				} else {
-					System.out.print("Please enter again(" + (5 - count) + "chances left" + ") : ");
-				}
-				password = keyboard.nextBigInteger();
-				if (password.equals(secret_key)) {
-					break;
-				}
-				count++;
-				if (count == 5) {
-					System.out.println("Decryption failed");
-					System.exit(0);
-				}
+			if(!password.equals(secret_key))
+			{
+				System.out.println("Wrong key");
+				System.exit(0);
 			}
 			
-			keyboard.nextLine();
-			
+
 			// 파일에서 한 바이트씩 읽어서 이진 문자열로 변환
             while ((data = inputStream_decom.read()) != -1) {
                 binaryString += String.format("%8s", Integer.toBinaryString(data & 0xFF)).replace(' ', '0');
@@ -170,7 +157,7 @@ public class Testing_for_decompressing {
         		}
         	}
         	
-        	save_text_file(keyboard, content);    
+        	save_text_file(content, save_file_path);    
 		}
 		catch (IOException e) {
             e.printStackTrace();
@@ -180,9 +167,8 @@ public class Testing_for_decompressing {
 	}
 
 	
-	private static void save_text_file(Scanner keyboard, String content) {
+	private static void save_text_file(String content, String text_file_path) {
 		System.out.print("\nEnter the location where the file will be saved : ");
-		String text_file_path = keyboard.nextLine();
 		
 		try(PrintWriter outputStream = new PrintWriter(text_file_path)) {
 			outputStream.print(content);
