@@ -14,7 +14,6 @@ public class Testing_for_decompressing {
 	public static void main_decompression(String decom_file, String password_string, String save_file_path) {
 		HashMap<String, Character> hash_map_for_decom = new HashMap<>();		//prefix를 저장할 해시맵
 		
-		System.out.print("Enter the path of file to de-compress : ");
 		Scanner keyboard = new Scanner(System.in);
 		
 		try (FileInputStream inputStream_decom = new FileInputStream(decom_file)) {
@@ -27,7 +26,6 @@ public class Testing_for_decompressing {
 			BigInteger secret_key = new BigInteger("23863");
 			BigInteger n = new BigInteger("42173");
 			BigInteger password = new BigInteger(password_string);
-			int count = 0;  // 남은 입력 기회
 
 			if(!password.equals(secret_key))
 			{
@@ -168,8 +166,7 @@ public class Testing_for_decompressing {
 
 	
 	private static void save_text_file(String content, String text_file_path) {
-		System.out.print("\nEnter the location where the file will be saved : ");
-		
+		text_file_path = text_file_path + ".txt";
 		try(PrintWriter outputStream = new PrintWriter(text_file_path)) {
 			outputStream.print(content);
 			System.out.print("\nContent is saved in " + text_file_path);
