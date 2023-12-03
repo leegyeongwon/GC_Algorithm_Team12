@@ -27,11 +27,9 @@ class HuffmanNode implements Comparable<HuffmanNode> {      //구조체(클래�
 
 public class Testing {
 	
-	public static void main_compress(String file, String path_of_bin_file) {
+	public static int main_compress(String file, String path_of_bin_file) {
 		Scanner keyboard = new Scanner(System.in);
 		HashMap<Character, Integer> frequencyMap = new HashMap<>();    //문자와 빈도를 저장하는데 hashmap 타입 사용
-		
-		System.out.println("Enter the name of file(include Path) : ");
 		
 		Scanner inputStream = null;
 		String file_content = "";
@@ -113,21 +111,13 @@ public class Testing {
 		BigInteger s_key = keylist[1];  
 		BigInteger n = keylist[2];      
 
-		System.out.println("Public Key : (" + p_key + ", " + n + ")");
-		System.out.println("Secret Key : (" + "*****" + ", " + n + ")");
-		
-		
-		
+		//System.out.println("Public Key : (" + p_key + ", " + n + ")");
+		//System.out.println("Secret Key : (" + "*****" + ", " + n + ")");
 
-		
-		
-		
-		
-		
 		String BinaryHashMap = Make_HashMap_To_Binary(HashMapHeader);
 		//현재 단계에서는 해시맵 정보만 들어있음. 여기서 해시맵 정보를 암호화 해야함
 		
-		System.out.println("BinaryHashMap : " + BinaryHashMap);
+		//System.out.println("BinaryHashMap : " + BinaryHashMap);
 		
 		//암호를 풀고 압축을 풀 때 보정을 위한 'num_of_zero'. 설명하자면 복잡함
 		int zero = 0;
@@ -136,10 +126,10 @@ public class Testing {
 				zero++;
 			}
 		}
-		System.out.println(zero);
+		//System.out.println(zero);
 		//2비트를 차지할거임
 		String num_of_zero = Integer.toBinaryString(zero);
-		System.out.println(padBinaryString(num_of_zero,2));
+		//System.out.println(padBinaryString(num_of_zero,2));
 		
 		
 		
@@ -148,7 +138,7 @@ public class Testing {
 		BigInteger plain_num = new BigInteger(BinaryHashMap, 2); 
 		//System.out.println("Plain number : " + plain_num); 
 		
-		System.out.println("plain_num : " + plain_num);
+		//System.out.println("plain_num : " + plain_num);
 		
 		// plain_num을 4자리씩 분할하여 각각에 대해 암호화 진행
 		String[] plain_divide = splitNumber(plain_num.toString(), 4);  // plain_num을 4자리씩 분할
@@ -184,15 +174,14 @@ public class Testing {
 		//바이너리로
 		HashMapHeaderCompletion = bigInteger.toString(2);
 		
-		System.out.println("\n16 bit " + padBinaryString(Integer.toBinaryString((HashMapHeaderCompletion.length())), 16) + "\n\n");
+		//System.out.println("\n16 bit " + padBinaryString(Integer.toBinaryString((HashMapHeaderCompletion.length())), 16) + "\n\n");
 		
 		HashMapHeaderCompletion = num_of_zero + padBinaryString(Integer.toBinaryString((HashMapHeaderCompletion.length())), 16) + HashMapHeaderCompletion;
 		
-		//헤더를 추가해서 압축한 내용과 같이 텍스트 파일을 저장
-		save_the_data(HashMapHeaderCompletion, compressed_string, keyboard, file, path_of_bin_file);
-		
 		inputStream.close();
 		keyboard.close();
+		//헤더를 추가해서 압축한 내용과 같이 텍스트 파일을 저장
+		return save_the_data(HashMapHeaderCompletion, compressed_string, keyboard, file, path_of_bin_file);
 	}
 		
 	
@@ -211,11 +200,11 @@ public class Testing {
 			MapHeaderString += "0";
 		}
 			
-		System.out.println("MapHeaderString : " + MapHeaderString);
+		//System.out.println("MapHeaderString : " + MapHeaderString);
 		return MapHeaderString;
 	}
 	
-	public static void save_the_data(String BinaryHashMap, String compressed_data, Scanner keyboard, String OriginFile, String file) {
+	public static int save_the_data(String BinaryHashMap, String compressed_data, Scanner keyboard, String OriginFile, String file) {
 		
 		String Header = "";
 		
@@ -242,9 +231,11 @@ public class Testing {
 			System.out.print("\nContent is saved in " + file + "\n");
 			System.out.println("Compressed : " + (int)getCompressibility(OriginFile, file) + "% of original.");
 
+			return (int)getCompressibility(OriginFile, file);
         } catch (IOException e) {
             e.printStackTrace();
         }
+		return 0;
 	}
 	
 	//String 타입을 byte[]타입으로 바꾸는 함수. byte[]타입은 0과 1이 8비트씩 쪼개 들어감.
@@ -352,15 +343,6 @@ public class Testing {
         }
 		return 0;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
     // 암호화 하기
 	public static BigInteger Encode(BigInteger plain, BigInteger p_key, BigInteger n) {
