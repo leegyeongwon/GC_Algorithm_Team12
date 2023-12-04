@@ -40,15 +40,13 @@ public class Testing_for_decompressing {
             }
             
             //2비트 읽어서 변수에 저장
-            int num_of_zero = Integer.parseInt(binaryString.substring(0, 2), 2);
+            int num_of_zero = Integer.parseInt(binaryString.substring(0, 3), 2);
             
             //16비트 읽어와서 암화화 prefix의 길이 찾기
-            int prefixLength = Integer.parseInt(binaryString.substring(2, 18), 2);
-            //System.out.println("Length of prefix : " + Integer.parseInt(binaryString.substring(2, 18), 2));
+            int prefixLength = Integer.parseInt(binaryString.substring(3, 19), 2);
             
-            String body = binaryString.substring(18 + prefixLength);
-            //System.out.println("body : " + body);
-			int cur_index = 18;
+            String body = binaryString.substring(19 + prefixLength);
+			int cur_index = 19;
 			
 			//암호화 prefix의 길이만큼 읽기
 			//암호화 prefix를 BigInteger로 변경
@@ -57,12 +55,15 @@ public class Testing_for_decompressing {
 			
 			cur_index = 0;
 			ArrayList<String> cipher_con = new ArrayList<>();
-			while(cur_index < Encoded_prefix_string.length()) {
+			while(cur_index < Encoded_prefix_string.length() - 1) {
 				int length_of_part = Encoded_prefix_string.charAt(cur_index) - '0';
 				cur_index++;
 				cipher_con.add(Encoded_prefix_string.substring(cur_index, cur_index + length_of_part).toString());
 				cur_index += length_of_part;
 			}
+			
+			System.out.println("cipher_con : " + cipher_con);
+			
 			
 			
 			// 복호화 진행 (사용자가 알맞은 secret key 입력 시)
@@ -76,55 +77,48 @@ public class Testing_for_decompressing {
 				cipherCon = new BigInteger(cipher_con.get(i));
 				Decrypt = (BigInteger) Decode(cipherCon, secret_key, n);
 				decrypt_div[i] = Decrypt.toString();
-				if (i == cipher_con.size() - 1) {
-					if (decrypt_div[i].length() != 4) {
-						for(int k = 0; k < 4 - decrypt_div[i].length(); k++) {
-							decrypt_div[i] = "0" + decrypt_div[i];
-						}
-					}
-				}
-				else if (decrypt_div[i].length() != 4) {
+				System.out.println("decrypt_div[i] length : " + decrypt_div[i].length() + " decrypt_div[i] : " + decrypt_div[i]);
+				
+				if (!(i == cipher_con.size() - 1) && decrypt_div[i].length() != 4) {
 					for (int j = 0; j <= 4 - decrypt_div[i].length(); j++) {
 						decrypt_div[i] = "0" + decrypt_div[i];
 					}
 				}
 			}
 
-
 			// 복호화된 여러 결과들을 하나의 문자열로 합치는 단계
 			String decrypt_con = "";
 			for (int i = 0; i < decrypt_div.length; i++) {
 				decrypt_con = decrypt_con.concat(decrypt_div[i]);
+				System.out.println(decrypt_div[i]);
 			}
 			
 			BigInteger decrypt_int = new BigInteger(decrypt_con);  // 합쳐진 문자열을 BigInteger 형태로 변환 
 			
+			System.out.println("decrypt_int :" + decrypt_int);
+			
 			// 복호화된 상태의 10진수를 2진수 형태로 변환 (압축이 완료된 직후의 형태)
 			String origin_binary = decrypt_int.toString(2);  
-
-			
 			
 			
 			
 			for(int i = 0; i < num_of_zero; i++)
 				origin_binary = "0" + origin_binary;
 			
-			//System.out.println("Original binary : " + origin_binary);
+			System.out.println("Original binary : " + origin_binary);
 			
 			String prepared_binary_string = origin_binary + body;
 			
 			
-			
-			
-			
 			//허프만 코드를 해석하는 단계
-        	//첫 4비트는 [허프만 코드의 길이]를 나타냄. 그다음 8비트는 문자, 그다음은 허프만 코드.
+        	//첫 5비트는 [허프만 코드의 길이]를 나타냄. 그다음 8비트는 문자, 그다음은 허프만 코드.
 			int current_index = 0;
         	int len_of_huffmancode = -1;
         	char character;
         	String HuffmanCode;
         	
         	while(len_of_huffmancode != 0) {
+        		
         		len_of_huffmancode = Integer.parseInt(prepared_binary_string.substring(current_index, current_index +5), 2);
         		current_index += 5;
             	
@@ -140,10 +134,10 @@ public class Testing_for_decompressing {
         	current_index -= 5;
         	
         	//허프만 코드 출력
-        	//System.out.println("\nResult");
-        	//for(Entry<String, Character> entry : hash_map_for_decom.entrySet()) {
-        	//	System.out.println("Key : " + entry.getKey() + "\t\t | Value : " + entry.getValue());
-        	//}
+        	System.out.println("\nResult");
+        	for(Entry<String, Character> entry : hash_map_for_decom.entrySet()) {
+        		System.out.println("Key : " + entry.getKey() + " | Value : " + entry.getValue());
+        	}
         	
         	String ASCII_Character = "";
         	String content = "";
