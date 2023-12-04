@@ -1,28 +1,33 @@
 package Testing_package;
 
-import java.awt.*;
-import javax.swing.*;
-
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class GUI_1 {
 
 	private JFrame frame;
 	StringBuilder sb = new StringBuilder();
 	private File f; // File 필드 추가
-	
-	
-	//Huffman encoder and decoder
-    //HuffmanEncoder encoder = new HuffmanEncoder();
-    //HuffmanDecoder decoder = new HuffmanDecoder();
-	
+	Color c1 = new Color(64, 64, 64);
+	Color c2 = new Color(255, 192, 0);
 	
 	/**
 	 * Launch the application.
@@ -53,16 +58,43 @@ public class GUI_1 {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 711, 605);
+		frame = new JFrame();		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		frame.setTitle("SECRET ZIP");
+		frame.setSize(600, 600);
+		frame.setLocationRelativeTo(null);
 		
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		JPanel titlePanel = new JPanel(new BorderLayout());
+		JPanel FunctionPanel = new JPanel(new BorderLayout());
+		JPanel subFPanel1 = new JPanel(new BorderLayout());
+		JPanel subFPanel2 = new JPanel(new BorderLayout());
+		JPanel subFPanel3 = new JPanel(new BorderLayout());
 		
-		JButton btnNewButton = new JButton("INPUT");
-		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 20));
+		mainPanel.setBackground(c1);
+		titlePanel.setBackground(c1);
+		FunctionPanel.setBackground(c1);
+		subFPanel1.setBackground(c1);
+		subFPanel2.setBackground(c1);
+		subFPanel3.setBackground(c1);
 		
-		btnNewButton.addActionListener(new ActionListener() {
+		titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+		subFPanel1.setBorder(BorderFactory.createEmptyBorder(30, 200, 30, 200));
+		subFPanel2.setBorder(BorderFactory.createEmptyBorder(70, 100, 70, 100));
+		subFPanel3.setBorder(BorderFactory.createEmptyBorder(70, 100, 70, 100));
+		
+		JLabel lblNewLabel = new JLabel("SECRET ZIP");
+		lblNewLabel.setForeground(c2);
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
+		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		titlePanel.add(lblNewLabel);
+		
+		JButton inputButton = new JButton("File Search");
+		inputButton.setFont(new Font("Tahoma", Font.BOLD, 20));
+		inputButton.setForeground(c1);
+		subFPanel1.add(inputButton, BorderLayout.CENTER);
+		
+		inputButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser chooser = new JFileChooser();
 				chooser.showOpenDialog(frame);
@@ -84,24 +116,20 @@ public class GUI_1 {
 		
 		//텍스트 필드 - 파일 경로
 		TextField FilePathText = new TextField("The path where you want to save the file ...");
-		FilePathText.setBounds(197, 311, 345, 25);
-		frame.getContentPane().add(FilePathText);
+		FilePathText.setFont((new Font("Tahoma", Font.BOLD, 12)));
+		subFPanel2.add(FilePathText, BorderLayout.NORTH);
+		
 		
 		//텍스트 필드2 - 시크릿 키
 		TextField SecretKey = new TextField("Secret Key (Enter only when decompress) ...");
-		SecretKey.setBounds(197, 340, 345, 25);
-		frame.getContentPane().add(SecretKey);
-		
-		
-		
-		btnNewButton.setBounds(263, 175, 186, 69);
-		frame.getContentPane().add(btnNewButton);
+		SecretKey.setFont((new Font("Tahoma", Font.BOLD, 12)));
+		subFPanel2.add(SecretKey, BorderLayout.SOUTH);
 		
 		
 		JButton CompBtn = new JButton("Compression");
 		CompBtn.setFont(new Font("Tahoma", Font.BOLD, 20));
-		CompBtn.setBounds(110, 444, 186, 56);
-		frame.getContentPane().add(CompBtn);
+		subFPanel3.add(CompBtn, BorderLayout.WEST);
+		
 		
 		CompBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -113,6 +141,8 @@ public class GUI_1 {
 		});
 		
 		JButton DecompBtn = new JButton("Decompression");
+		DecompBtn.setFont(new Font("Tahoma", Font.BOLD, 20));
+		subFPanel3.add(DecompBtn, BorderLayout.EAST);
 		
 		DecompBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -129,16 +159,16 @@ public class GUI_1 {
 		});
 		
 		
-		DecompBtn.setFont(new Font("Tahoma", Font.BOLD, 20));
-		DecompBtn.setBounds(442, 444, 217, 56);
-		frame.getContentPane().add(DecompBtn);
 		
 		
-		JLabel lblNewLabel = new JLabel("Huffman & RSA");
-		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 30));
-		lblNewLabel.setBounds(263, 28, 296, 36);
-		frame.getContentPane().add(lblNewLabel);
+		FunctionPanel.add(subFPanel1, BorderLayout.NORTH);
+		FunctionPanel.add(subFPanel2, BorderLayout.CENTER);
+		FunctionPanel.add(subFPanel3, BorderLayout.SOUTH);
 		
+		mainPanel.add(titlePanel, BorderLayout.NORTH);
+		mainPanel.add(FunctionPanel, BorderLayout.CENTER);
+		
+		frame.add(mainPanel);
 		
 	}
 	
