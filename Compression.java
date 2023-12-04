@@ -57,20 +57,8 @@ public class Testing {
 		
 		frequencyMap.put((char)10, newLine.size());
 		
-		
-		//System.out.println(newLine);
-		
-		//for(Entry<Character, Integer> entry : frequencyMap.entrySet()) {
-		//	System.out.println("Key : " + entry.getKey() + " | Value : " + entry.getValue());     //하나하나 출력해보는 테스트 코드
-		//}
-		
 		PriorityQueue<HuffmanNode> priority_queue = new PriorityQueue<>();
 		priority_queue = Make_Priority_Queue(frequencyMap);
-		
-		//frequency만 출력하는 테스트 코드
-		//while(priority_queue.isEmpty()) {
-		//	System.out.println("frequency : " + priority_queue.peek().frequency);
-		//}
 		
 		//바이너리 트리 만들기
 		HuffmanNode root = BuildBinaryTree(priority_queue);
@@ -79,11 +67,6 @@ public class Testing {
 		HashMap<Character, String> BinaryCode = new HashMap<>();
 		GenerateBinaryCode(root, "", BinaryCode);
 		
-		//max_len_of_binarycode 헤더를 만들 때 [허프만코드길이][아스키코드화문자][허프만코드] 중 [허프만코드길이]에 해당하는 부분임.
-		//for(Entry<Character, String> entry : BinaryCode.entrySet()) {
-		//	System.out.println(entry.getKey() + " : " + entry.getValue());
-		//}
-		
 		
 		//헤더에 해당되는 해시맵 만들기
 		HashMap<String, String> HashMapHeader = new HashMap<>();
@@ -91,14 +74,14 @@ public class Testing {
 			HashMapHeader.put(padBinaryString(Integer.toBinaryString((int)entry.getKey()),8), entry.getValue());
 		}
 		
-		/*for(Entry<String, String> entry : HashMapHeader.entrySet()) {
+		for(Entry<String, String> entry : HashMapHeader.entrySet()) {
 			System.out.println("Key :" + entry.getKey() + " value :" + entry.getValue() + " value's len in binary : " + Integer.toBinaryString(entry.getValue().length()));
-			System.out.println(" value :" + entry.getValue());
-		}*/
+			//System.out.println(" value :" + entry.getValue());
+		}
 		
 		//압축단계
 		String compressed_string = Compress(BinaryCode, file_content, newLine);
-		//System.out.println("Compressed_string : " + compressed_string);
+		System.out.println("Compressed_string : " + compressed_string);
 		
 		
 		// public key & secret key 생성
@@ -110,44 +93,34 @@ public class Testing {
 		BigInteger p_key = keylist[0];   
 		BigInteger s_key = keylist[1];  
 		BigInteger n = keylist[2];      
-
-		//System.out.println("Public Key : (" + p_key + ", " + n + ")");
-		//System.out.println("Secret Key : (" + "*****" + ", " + n + ")");
-
+		
 		String BinaryHashMap = Make_HashMap_To_Binary(HashMapHeader);
 		//현재 단계에서는 해시맵 정보만 들어있음. 여기서 해시맵 정보를 암호화 해야함
 		
-		//System.out.println("BinaryHashMap : " + BinaryHashMap);
+		System.out.println("BinaryHashMap : " + BinaryHashMap);
 		
 		//암호를 풀고 압축을 풀 때 보정을 위한 'num_of_zero'. 설명하자면 복잡함
 		int zero = 0;
-		for(int i = 0; i < 5; i++) {
-			if((int)BinaryHashMap.charAt(i) - '0' == 0) {
-				zero++;
-			}
+		int zero_index = 0;
+		while(!((int)BinaryHashMap.charAt(zero_index) - '0' == 1)) {
+			zero++;
+			zero_index++;
 		}
-		//System.out.println(zero);
-		//2비트를 차지할거임
+		System.out.println("zero : " + zero);
+		//3비트를 차지할거임
 		String num_of_zero = Integer.toBinaryString(zero);
-		//System.out.println(padBinaryString(num_of_zero,2));
-		
+		System.out.println(padBinaryString(num_of_zero,2));
 		
 		
 		// 2진수 형태의 prefix를 암호화하기 위해 10진수로 변환
 		// BigInteger 형태는 무한대 범위까지의 정수를 저장하는 것이 가능 
+		System.out.println("BinaryHashMap : " + BinaryHashMap);
 		BigInteger plain_num = new BigInteger(BinaryHashMap, 2); 
-		//System.out.println("Plain number : " + plain_num); 
-		
-		//System.out.println("plain_num : " + plain_num);
+		System.out.println("Plain number : " + plain_num); 
 		
 		// plain_num을 4자리씩 분할하여 각각에 대해 암호화 진행
 		String[] plain_divide = splitNumber(plain_num.toString(), 4);  // plain_num을 4자리씩 분할
 		String[] cipher_con = new String[plain_divide.length];         // plain_divide 배열과 동일한 크기를 가진 문자 배열 생성
-		
-		
-		//for(int i = 0; i < plain_divide.length; i++) {
-		//	System.out.println(plain_divide[i]);
-		//}
 		
 		
 		BigInteger plainDiv;  // plain_num을 4자리씩 분할하여 임시로 저장해놓을 변수
@@ -157,26 +130,23 @@ public class Testing {
 			plainDiv = new BigInteger(plain_divide[i]);
 			cipher = (BigInteger) Encode(plainDiv, p_key, n);
 			cipher_con[i] = cipher.toString();  // 분할된 수들을 암호화하여 각 인덱스에 저장
-			//System.out.println(cipher_con[i]);
 		}
 		
 		String HashMapHeaderCompletion = "";
 		for (String part : cipher_con) {
-			//System.out.println(part);
+			System.out.println(part);
 			HashMapHeaderCompletion = HashMapHeaderCompletion + part.length() + part;
 		}
 		
 		//BigInteger로
 		BigInteger bigInteger = new BigInteger(HashMapHeaderCompletion, 10);
 		
-		//System.out.println(bigInteger);
-		
 		//바이너리로
 		HashMapHeaderCompletion = bigInteger.toString(2);
 		
-		//System.out.println("\n16 bit " + padBinaryString(Integer.toBinaryString((HashMapHeaderCompletion.length())), 16) + "\n\n");
+		HashMapHeaderCompletion = padBinaryString(num_of_zero,3) + padBinaryString(Integer.toBinaryString((HashMapHeaderCompletion.length())), 16) + HashMapHeaderCompletion;
 		
-		HashMapHeaderCompletion = num_of_zero + padBinaryString(Integer.toBinaryString((HashMapHeaderCompletion.length())), 16) + HashMapHeaderCompletion;
+		System.out.println("num_of_zero : " + padBinaryString(num_of_zero,3) + "\nlen : " + padBinaryString(Integer.toBinaryString((HashMapHeaderCompletion.length())), 16));
 		
 		inputStream.close();
 		keyboard.close();
@@ -193,14 +163,12 @@ public class Testing {
 	
 		for(Entry<String, String> entry : map.entrySet()) {
 			MapHeaderString = MapHeaderString + padBinaryString(Integer.toBinaryString(entry.getValue().length()), 5) + entry.getKey() + entry.getValue();
-			//System.out.println("pad toBinaryString : " + padBinaryString(Integer.toBinaryString(entry.getValue().length()), 4));
 		}
 		
 		for(int i = 0; i < 5; i++) {
 			MapHeaderString += "0";
 		}
-			
-		//System.out.println("MapHeaderString : " + MapHeaderString);
+
 		return MapHeaderString;
 	}
 	
@@ -212,19 +180,11 @@ public class Testing {
 		
 		// 해시 맵 정보를 합쳐서 하나의 바이너리 스트링으로 만듦
 		try (BufferedOutputStream bin_file = new BufferedOutputStream(new FileOutputStream(file))) {
-			
-			
-			
+
 			//해시맵 정보 + 원문
 			Header = BinaryHashMap + compressed_data;
 			
-			//System.out.println("MapHeaderString : : : : " + MapHeaderString);
-			
-			
 			byte[] FinalHeader = binaryStringToByteArray(Header);
-			//for (byte b : MapHeader) {
-	        //    System.out.print(Integer.toBinaryString(b & 255 | 256).substring(1));
-	        //}
 			
 			bin_file.write(FinalHeader);
 			bin_file.close();
@@ -390,12 +350,6 @@ public class Testing {
 		}
 		return num;
 	}
-
-	/*// 암호화 풀기(암호화된 ciphertext를 원래 plaintext로 변환)
-	public static BigInteger Decode(BigInteger cipher, BigInteger s_key, BigInteger n) {
-		BigInteger result = cipher.modPow(s_key, n); // "cipher^s_key mod n"
-		return result;
-	}*/
 
 	// 문자열을 일정 길이(chunkSize)로 분할하여 문자 배열의 각 인덱스에 저장하는 메소드
 	public static String[] splitNumber(String number, int chunkSize) {
