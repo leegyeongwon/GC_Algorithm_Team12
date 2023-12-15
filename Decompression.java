@@ -39,7 +39,7 @@ public class Testing_for_decompressing {
                 binaryString += String.format("%8s", Integer.toBinaryString(data & 0xFF)).replace(' ', '0');
             }
             
-            //2비트 읽어서 변수에 저장
+            //3비트 읽어서 변수에 저장 (보정을 위함)
             int num_of_zero = Integer.parseInt(binaryString.substring(0, 3), 2);
             
             //16비트 읽어와서 암화화 prefix의 길이 찾기
@@ -130,7 +130,7 @@ public class Testing_for_decompressing {
             	
             	hash_map_for_decom.put(HuffmanCode, character);
         	}
-        	//위 과정에서 5비트 만큼 밀려서 다시 당겨줌
+        	//위 과정에서 뒤로 5비트 만큼 밀려서 다시 당겨줌
         	current_index -= 5;
         	
         	//허프만 코드 출력
