@@ -20,9 +20,7 @@ public class Testing_for_decompressing {
 			int data;
 			String binaryString = "";
 			
-			
-			
-			
+
 			BigInteger secret_key = new BigInteger("23863");
 			BigInteger n = new BigInteger("42173");
 			BigInteger password = new BigInteger(password_string);
@@ -39,11 +37,15 @@ public class Testing_for_decompressing {
                 binaryString += String.format("%8s", Integer.toBinaryString(data & 0xFF)).replace(' ', '0');
             }
             
+            //System.out.println("binaryString : " + binaryString);
+            
             //3비트 읽어서 변수에 저장 (보정을 위함)
             int num_of_zero = Integer.parseInt(binaryString.substring(0, 3), 2);
+            //System.out.println("num_of_zero : " + num_of_zero);
             
             //16비트 읽어와서 암화화 prefix의 길이 찾기
             int prefixLength = Integer.parseInt(binaryString.substring(3, 19), 2);
+            //System.out.println("prefixLength : " + binaryString.substring(3, 19));
             
             String body = binaryString.substring(19 + prefixLength);
 			int cur_index = 19;
@@ -62,7 +64,7 @@ public class Testing_for_decompressing {
 				cur_index += length_of_part;
 			}
 			
-			System.out.println("cipher_con : " + cipher_con);
+			//System.out.println("cipher_con : " + cipher_con);
 			
 			
 			
@@ -77,9 +79,14 @@ public class Testing_for_decompressing {
 				cipherCon = new BigInteger(cipher_con.get(i));
 				Decrypt = (BigInteger) Decode(cipherCon, secret_key, n);
 				decrypt_div[i] = Decrypt.toString();
-				System.out.println("decrypt_div[i] length : " + decrypt_div[i].length() + " decrypt_div[i] : " + decrypt_div[i]);
-				
-				if (!(i == cipher_con.size() - 1) && decrypt_div[i].length() != 4) {
+				if (i == cipher_con.size() - 1) {
+					if (decrypt_div[i].length() != 4) {
+						for(int k = 0; k < 4 - decrypt_div[i].length(); k++) {
+							decrypt_div[i] = "0" + decrypt_div[i];
+						}
+					}
+				}
+				else if (decrypt_div[i].length() != 4) {
 					for (int j = 0; j <= 4 - decrypt_div[i].length(); j++) {
 						decrypt_div[i] = "0" + decrypt_div[i];
 					}
@@ -95,7 +102,7 @@ public class Testing_for_decompressing {
 			
 			BigInteger decrypt_int = new BigInteger(decrypt_con);  // 합쳐진 문자열을 BigInteger 형태로 변환 
 			
-			System.out.println("decrypt_int :" + decrypt_int);
+			//System.out.println("decrypt_int :" + decrypt_int);
 			
 			// 복호화된 상태의 10진수를 2진수 형태로 변환 (압축이 완료된 직후의 형태)
 			String origin_binary = decrypt_int.toString(2);  
@@ -105,7 +112,7 @@ public class Testing_for_decompressing {
 			for(int i = 0; i < num_of_zero; i++)
 				origin_binary = "0" + origin_binary;
 			
-			System.out.println("Original binary : " + origin_binary);
+			//System.out.println("Original binary : " + origin_binary);
 			
 			String prepared_binary_string = origin_binary + body;
 			
